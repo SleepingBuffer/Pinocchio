@@ -25,21 +25,21 @@
 class PINOCCHIO_API Intersector {
 public:
     Intersector() : mesh(NULL) {}
-    Intersector(const Mesh &m, const Vector3 &inDir) : mesh(&m), dir(inDir) { init(); }
+    Intersector(const Mesh &m, const PVector3 &inDir) : mesh(&m), dir(inDir) { init(); }
     
-    vector<Vector3> intersect(const Vector3 &pt, vector<int> *outIndices = NULL) const;    
-    const Vector3 &getDir() const { return dir; }
+    vector<PVector3> intersect(const PVector3 &pt, vector<int> *outIndices = NULL) const;    
+    const PVector3 &getDir() const { return dir; }
 private:
     void init();
-    void getIndex(const Vector2 &pt, int &x, int &y) const;
+    void getIndex(const PVector2 &pt, int &x, int &y) const;
     
     const Mesh *mesh;
-    Vector3 dir;
-    Vector3 v1, v2; //basis
+    PVector3 dir;
+    PVector3 v1, v2; //basis
     Rect2 bounds; //within the basis
     
-    vector<Vector2> points;
-    vector<Vector3> sNormals; //they are scaled for intersection
+    vector<PVector2> points;
+    vector<PVector3> sNormals; //they are scaled for intersection
     vector<vector<int> > triangles;
 };
 

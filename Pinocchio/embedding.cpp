@@ -21,12 +21,12 @@
 
 struct FP //information for penalty functions
 {
-    FP(const PtGraph &inG, const Skeleton &inSk, const vector<Sphere> &inS)
+    FP(const PtGraph &inG, const Skeleton &inSk, const vector<PSphere> &inS)
         : graph(inG), given(inSk), sph(inS), paths(inG) {}
 
     const PtGraph &graph;
     const Skeleton &given;
-    const vector<Sphere> &sph;
+    const vector<PSphere> &sph;
     AllShortestPather paths;
     double footBase;
 };
@@ -55,7 +55,7 @@ public:
     double weight;
 };
 
-vector<vector<int> > computePossibilities(const PtGraph &graph, const vector<Sphere> &spheres,
+vector<vector<int> > computePossibilities(const PtGraph &graph, const vector<PSphere> &spheres,
                                           const Skeleton &skeleton)
 {
     int i, j;
@@ -66,14 +66,14 @@ vector<vector<int> > computePossibilities(const PtGraph &graph, const vector<Sph
         allVerts.push_back(i);
         const vector<int> &edg = graph.edges[i];
         double rad = spheres[i].radius;
-        Vector3 cur = graph.verts[i];
+        PVector3 cur = graph.verts[i];
         for(j = 0; j < (int)edg.size(); ++j) {
-            Vector3 e1 = graph.verts[edg[j]];
+            PVector3 e1 = graph.verts[edg[j]];
             int k;
             for(k = 0; k < (int)edg.size(); ++k) {
                 if(rad > 2. * spheres[edg[k]].radius)
                     continue;
-                Vector3 e2 = graph.verts[edg[k]];
+                PVector3 e2 = graph.verts[edg[k]];
                 if((e2 - cur).normalize() * (cur - e1).normalize() > 0.8)
                     break;
             }
@@ -128,7 +128,7 @@ double computePenalty(const vector<PenaltyFunction *> &penaltyFunctions,
     return out;
 }
 
-vector<int> discreteEmbed(const PtGraph &graph, const vector<Sphere> &spheres,
+vector<int> discreteEmbed(const PtGraph &graph, const vector<PSphere> &spheres,
                           const Skeleton &skeleton, const vector<vector<int> > &possibilities)
 {
     int i, j;
@@ -222,7 +222,7 @@ vector<int> discreteEmbed(const PtGraph &graph, const vector<Sphere> &spheres,
     return output.match;
 }
 
-vector<Vector3> splitPath(FP *fp, int joint, int curIdx, int prevIdx)
+vector<PVector3> splitPath(FP *fp, int joint, int curIdx, int prevIdx)
 {
     int i;
     vector<int> newPath = fp->paths.path(prevIdx, curIdx);
@@ -234,7 +234,7 @@ vector<Vector3> splitPath(FP *fp, int joint, int curIdx, int prevIdx)
     } while(fp->given.fcMap()[uncompIdx.back()] == -1);
     reverse(uncompIdx.begin(), uncompIdx.end());
 
-    vector<Vector3> pathPts(uncompIdx.size(), fp->graph.verts[newPath[0]]);
+    vector<PVector3> pathPts(uncompIdx.size(), fp->graph.verts[newPath[0]]);
     
     if(newPath.size() > 1) { //if there is a meaningful path in the extracted graph
         double dist = fp->paths.dist(newPath[0], newPath.back());
@@ -244,7 +244,7 @@ vector<Vector3> splitPath(FP *fp, int joint, int curIdx, int prevIdx)
             lengths.push_back(lengths.back() + dist * fp->given.fcFraction()[uncompIdx[i]]);
         }
         
-        vector<Vector3> newPathPts(newPath.size());
+        vector<PVector3> newPathPts(newPath.size());
         for(i = 0; i < (int)newPath.size(); ++i)
             newPathPts[i] = fp->graph.verts[newPath[i]];
         
@@ -268,18 +268,18 @@ vector<Vector3> splitPath(FP *fp, int joint, int curIdx, int prevIdx)
     return pathPts;
 }
 
-vector<Vector3> splitPaths(const vector<int> &discreteEmbedding, const PtGraph &graph,
+vector<PVector3> splitPaths(const vector<int> &discreteEmbedding, const PtGraph &graph,
                                          const Skeleton &skeleton)
 {
-    FP fp(graph, skeleton, vector<Sphere>());
+    FP fp(graph, skeleton, vector<PSphere>());
 
-    vector<Vector3> out;
+    vector<PVector3> out;
 
     out.push_back(graph.verts[discreteEmbedding[0]]);
     for(int i = 1; i < (int)discreteEmbedding.size(); ++i) {
         int prev = skeleton.cPrev()[i];
     
-        vector<Vector3> pathPts = splitPath(&fp, i, discreteEmbedding[i], discreteEmbedding[prev]);
+        vector<PVector3> pathPts = splitPath(&fp, i, discreteEmbedding[i], discreteEmbedding[prev]);
         out.insert(out.end(), pathPts.begin() + 1, pathPts.end());
     }
 
@@ -324,9 +324,9 @@ public:
     }
 };
 
-vector<Vector3> computeDirs(FP * fp, const PartialMatch &cur, int next, int idx = -1)
+vector<PVector3> computeDirs(FP * fp, const PartialMatch &cur, int next, int idx = -1)
 {
-    vector<Vector3> out;
+    vector<PVector3> out;
     if(idx == -1)
         idx = cur.match.size();
     
@@ -335,7 +335,7 @@ vector<Vector3> computeDirs(FP * fp, const PartialMatch &cur, int next, int idx 
     if(idx == 0 || next == cur.match[prev]) //path of zero length
         return out;
 
-    vector<Vector3> pathPts = splitPath(fp, idx, next, cur.match[prev]);
+    vector<PVector3> pathPts = splitPath(fp, idx, next, cur.match[prev]);
         
     out.resize(pathPts.size() - 1);
 
@@ -361,8 +361,8 @@ public:
 
         //check if the path has length 1 (like a head)
         if(fp->given.fcMap()[fp->given.fPrev()[fp->given.cfMap()[idx]]] == prev) {
-            Vector3 sDir = fp->given.cGraph().verts[idx] - fp->given.cGraph().verts[prev];
-            Vector3 dir = fp->graph.verts[next] - fp->graph.verts[cur.match[prev]];
+            PVector3 sDir = fp->given.cGraph().verts[idx] - fp->given.cGraph().verts[prev];
+            PVector3 dir = fp->graph.verts[next] - fp->graph.verts[cur.match[prev]];
 
             double dot = sDir.normalize() * dir.normalize();
 
@@ -380,12 +380,12 @@ public:
         } while(fp->given.fcMap()[uncompIdx.back()] == -1);
         reverse(uncompIdx.begin(), uncompIdx.end());
         
-        vector<Vector3> dirs = computeDirs(fp, cur, next, idx);
+        vector<PVector3> dirs = computeDirs(fp, cur, next, idx);
         if(dirs.size() == 0)
             return out;
 
         for(int i = 0; i < (int)dirs.size(); ++i) {
-            Vector3 sDir = fp->given.fGraph().verts[uncompIdx[i + 1]] - 
+            PVector3 sDir = fp->given.fGraph().verts[uncompIdx[i + 1]] - 
                 fp->given.fGraph().verts[uncompIdx[i]];
             
             double dot = sDir.normalize() * dirs[i];
@@ -442,8 +442,8 @@ public:
                     continue;
             if((fp->graph.verts[next] - fp->graph.verts[cur.match[i]]).lengthsq() < 1e-16)
                     continue;
-            Vector3 ourBigDir = (fp->graph.verts[next] - fp->graph.verts[cur.match[i]]);
-            Vector3 givenBigDir = (fp->given.cGraph().verts[idx] - fp->given.cGraph().verts[i]).normalize();
+            PVector3 ourBigDir = (fp->graph.verts[next] - fp->graph.verts[cur.match[i]]);
+            PVector3 givenBigDir = (fp->given.cGraph().verts[idx] - fp->given.cGraph().verts[i]).normalize();
             double dot = ourBigDir.normalize() * givenBigDir;
 
             if(i == prev) {
@@ -524,14 +524,14 @@ public:
         if(fp->given.cGraph().edges[idx].size() != 1 || next == cur.match[prev])
             return 0;
 
-        Vector3 ourBigDir = (fp->graph.verts[next] - fp->graph.verts[cur.match[prev]]).normalize();
+        PVector3 ourBigDir = (fp->graph.verts[next] - fp->graph.verts[cur.match[prev]]).normalize();
         double curRad = fp->sph[next].radius;
         for(int i = 0; i < (int)fp->graph.edges[next].size(); ++i) {
             int oth = fp->graph.edges[next][i];
             if(curRad > 2. * fp->sph[oth].radius)
                 continue;
-            Vector3 diff1 = (fp->graph.verts[oth] - fp->graph.verts[cur.match[prev]]).normalize();
-            Vector3 diff2 = (fp->graph.verts[oth] - fp->graph.verts[next]).normalize();
+            PVector3 diff1 = (fp->graph.verts[oth] - fp->graph.verts[cur.match[prev]]).normalize();
+            PVector3 diff2 = (fp->graph.verts[oth] - fp->graph.verts[next]).normalize();
             if(diff1 * ourBigDir > 0.95 && diff2 * ourBigDir > 0.8)
                 return 1.;
         }

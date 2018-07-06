@@ -115,12 +115,12 @@ void Mesh::computeVertexNormals()
 {
     int i;
     for(i = 0; i < (int)vertices.size(); ++i)
-        vertices[i].normal = Vector3();
+        vertices[i].normal = PVector3();
     for(i = 0; i < (int)edges.size(); i += 3) {
         int i1 = edges[i].vertex;
         int i2 = edges[i + 1].vertex;
         int i3 = edges[i + 2].vertex;
-        Vector3 normal = ((vertices[i2].pos - vertices[i1].pos) % (vertices[i3].pos - vertices[i1].pos)).normalize();
+        PVector3 normal = ((vertices[i2].pos - vertices[i1].pos) % (vertices[i3].pos - vertices[i1].pos)).normalize();
         vertices[i1].normal += normal;
         vertices[i2].normal += normal;
         vertices[i3].normal += normal;
@@ -132,13 +132,13 @@ void Mesh::computeVertexNormals()
 void Mesh::normalizeBoundingBox()
 {
     int i;
-    vector<Vector3> positions;
+    vector<PVector3> positions;
     for(i = 0; i < (int)vertices.size(); ++i) {
         positions.push_back(vertices[i].pos);
     }
     Rect3 boundingBox = Rect3(positions.begin(), positions.end());
     double cscale = .9 / boundingBox.getSize().accumulate(ident<double>(), maximum<double>());
-    Vector3 ctoAdd = Vector3(0.5, 0.5, 0.5) - boundingBox.getCenter() * cscale;
+    PVector3 ctoAdd = PVector3(0.5, 0.5, 0.5) - boundingBox.getCenter() * cscale;
     for(i = 0; i < (int)vertices.size(); ++i) {
         vertices[i].pos = ctoAdd + vertices[i].pos * cscale;
     }
@@ -255,7 +255,7 @@ void Mesh::readObj(istream &strm)
             sscanf(words[3].c_str(), "%lf", &z);
             
             vertices.resize(vertices.size() + 1);
-            vertices.back().pos = Vector3(x, y, z);
+            vertices.back().pos = PVector3(x, y, z);
         }
         
         if(words[0][0] == 'f') {
@@ -332,7 +332,7 @@ void Mesh::readPly(istream &strm)
             sscanf(words[2].c_str(), "%lf", &z);
             
             vertices.resize(vertices.size() + 1);
-            vertices.back().pos = Vector3(-z, x, -y);
+            vertices.back().pos = PVector3(-z, x, -y);
             continue;
         }
         
@@ -396,7 +396,7 @@ void Mesh::readOff(istream &strm)
             sscanf(words[2].c_str(), "%lf", &z);
             
             vertices.resize(vertices.size() + 1);
-            vertices.back().pos = Vector3(x, y, z);
+            vertices.back().pos = PVector3(x, y, z);
             
             continue;
         }
@@ -465,7 +465,7 @@ void Mesh::readGts(istream &strm)
             sscanf(words[2].c_str(), "%lf", &z);
             
             vertices.resize(vertices.size() + 1);
-            vertices.back().pos = Vector3(-x, z, y);
+            vertices.back().pos = PVector3(-x, z, y);
             
             continue;
         }
@@ -514,10 +514,10 @@ void Mesh::readGts(istream &strm)
     }
 }
 
-class StlVtx : public Vector3
+class StlVtx : public PVector3
 {
 public:
-    StlVtx(double x, double y, double z) : Vector3(x, y, z) {}
+    StlVtx(double x, double y, double z) : PVector3(x, y, z) {}
     bool operator==(const StlVtx &o) const { return (*this)[0] == o[0] && (*this)[1] == o[1] && (*this)[2] == o[2]; }
     bool operator<(const StlVtx &o) const { return (*this)[0] < o[0] || ((*this)[0] == o[0] &&
         ((*this)[1] < o[1] || ((*this)[1] == o[1] && (*this)[2] < o[2]))); }
@@ -534,7 +534,7 @@ void Mesh::readStl(istream &strm)
     
     vector<int> lastIdxs;
     
-    Vector3 normal;
+    PVector3 normal;
     
     while(!strm.eof()) {
         ++lineNum;

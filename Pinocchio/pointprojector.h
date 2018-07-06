@@ -28,31 +28,31 @@
 
 struct Vec3Object
 {
-    Vec3Object(const Vector3 &inV) : v(inV) {}
+    Vec3Object(const PVector3 &inV) : v(inV) {}
     
     Rect3 boundingRect() const { return Rect3(v); }
     double operator[](int i) const { return v[i]; }
-    Vector3 project(const Vector3 &) const { return v; }
+    PVector3 project(const PVector3 &) const { return v; }
     
-    Vector3 v;
+    PVector3 v;
 };
 
 struct Tri3Object
 {
-    Tri3Object(const Vector3 &inV1, const Vector3 &inV2, const Vector3 &inV3) : v1(inV1), v2(inV2), v3(inV3) {}
+    Tri3Object(const PVector3 &inV1, const PVector3 &inV2, const PVector3 &inV3) : v1(inV1), v2(inV2), v3(inV3) {}
     
     Rect3 boundingRect() const { return Rect3(v1) | Rect3(v2) | Rect3(v3); }
     double operator[](int i) const { return v1[i] + v2[i] + v3[i]; } //for comparison only, no need to divide by 3
-    Vector3 project(const Vector3 &v) const { return projToTri(v, v1, v2, v3); }
+    PVector3 project(const PVector3 &v) const { return projToTri(v, v1, v2, v3); }
     
-    Vector3 v1, v2, v3;
+    PVector3 v1, v2, v3;
 };
 
 template<int Dim, class Obj>
 class ObjectProjector
 {
 public:
-    typedef Vector<double, Dim> Vec;
+    typedef PVector<double, Dim> Vec;
     typedef Rect<double, Dim> Rec;
 
     ObjectProjector() {}

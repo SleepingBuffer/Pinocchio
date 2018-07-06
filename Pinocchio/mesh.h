@@ -28,8 +28,8 @@ struct MeshVertex
 {
     MeshVertex() : edge(-1) {}
     
-    Vector3 pos;
-    Vector3 normal;
+    PVector3 pos;
+    PVector3 normal;
     int edge; //an edge such that edge->prev->vertex is this
 };
 
@@ -53,6 +53,8 @@ public:
     void normalizeBoundingBox();
     void computeTopology();
     void writeObj(const string &filename) const;
+	void fixDupFaces();
+	void sortEdges(); //sort edges so that triplets forming faces are adjacent
     
 private:
     void readObj(istream &strm);
@@ -60,14 +62,12 @@ private:
     void readPly(istream &strm);
     void readGts(istream &strm);
     void readStl(istream &strm);
-    void fixDupFaces();
-    void sortEdges(); //sort edges so that triplets forming faces are adjacent
 
 public: //data
     vector<MeshVertex> vertices;
     vector<MeshEdge> edges; //halfEdges, really
 
-    Vector3 toAdd;
+    PVector3 toAdd;
     double scale;
 };
 

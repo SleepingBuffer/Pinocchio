@@ -24,7 +24,7 @@
 
 struct PtGraph
 {
-    vector<Vector3> verts;
+    vector<PVector3> verts;
     vector<vector<int> > edges;
     
     bool integrityCheck() const;

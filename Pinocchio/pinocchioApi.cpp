@@ -35,9 +35,9 @@ PinocchioOutput autorig(const Skeleton &given, const Mesh &m)
     TreeType *distanceField = constructDistanceField(newMesh);
 
     //discretization
-    vector<Sphere> medialSurface = sampleMedialSurface(distanceField);
+    vector<PSphere> medialSurface = sampleMedialSurface(distanceField);
 
-    vector<Sphere> spheres = packSpheres(medialSurface);
+    vector<PSphere> spheres = packSpheres(medialSurface);
 
     PtGraph graph = connectSamples(distanceField, spheres);
 
@@ -54,10 +54,10 @@ PinocchioOutput autorig(const Skeleton &given, const Mesh &m)
         return out;
     }
 
-    vector<Vector3> discreteEmbedding = splitPaths(embeddingIndices, graph, given);
+    vector<PVector3> discreteEmbedding = splitPaths(embeddingIndices, graph, given);
 
     //continuous refinement
-    vector<Vector3> medialCenters(medialSurface.size());
+    vector<PVector3> medialCenters(medialSurface.size());
     for(i = 0; i < (int)medialSurface.size(); ++i)
         medialCenters[i] = medialSurface[i].center;
 

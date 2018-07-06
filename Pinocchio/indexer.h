@@ -54,12 +54,12 @@ class DumbIndexer
 extern PINOCCHIO_API unsigned int interLeaveLookupTable[32768];
 extern PINOCCHIO_API unsigned int interLeave3LookupTable[1024];
 
-inline unsigned int _lookup(const Vector2 &vec)
+inline unsigned int _lookup(const PVector2 &vec)
 {
     return interLeaveLookupTable[int(vec[0] * 32767.999)] + (interLeaveLookupTable[int(vec[1] * 32767.999)] << 1);
 }
 
-inline unsigned int _lookup(const Vector3 &vec)
+inline unsigned int _lookup(const PVector3 &vec)
 {
     return interLeave3LookupTable[int(vec[0] * 1023.999)] +
           (interLeave3LookupTable[int(vec[1] * 1023.999)] << 1) +

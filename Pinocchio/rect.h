@@ -28,7 +28,7 @@ template <int Dim> class RectOp;
 template<class Real, int Dim>
 class Rect {
 public:
-    typedef Vector<Real, Dim> Vec;
+    typedef PVector<Real, Dim> Vec;
     typedef Rect<Real, Dim> Self;
     typedef _RectPrivate::RectOp<Dim> RO;
     
@@ -136,7 +136,7 @@ template <class charT, class traits, class Real, int Dim>
 }
 
 namespace _RectPrivate {
-#define VRD Vector<R, D>
+#define VRD PVector<R, D>
 #define RRD Rect<R, D>
 template <int Dim>
 class RectOp

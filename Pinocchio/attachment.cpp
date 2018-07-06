@@ -28,14 +28,14 @@ public:
     AttachmentPrivate() {}
     virtual ~AttachmentPrivate() {}
     virtual Mesh deform(const Mesh &mesh, const vector<Transform<> > &transforms) const = 0;
-    virtual Vector<double, -1> getWeights(int i) const = 0;
+    virtual PVector<double, -1> getWeights(int i) const = 0;
     virtual AttachmentPrivate *clone() const = 0;
 };
 
-bool vectorInCone(const Vector3 &v, const vector<Vector3> &ns)
+bool vectorInCone(const PVector3 &v, const vector<PVector3> &ns)
 {
     int i;
-    Vector3 avg;
+    PVector3 avg;
     for(i = 0; i < (int)ns.size(); ++i)
         avg += ns[i];
 
@@ -46,7 +46,7 @@ class AttachmentPrivate1 : public AttachmentPrivate {
 public:
     AttachmentPrivate1() {}
 
-    AttachmentPrivate1(const Mesh &mesh, const Skeleton &skeleton, const vector<Vector3> &match, const VisibilityTester *tester,
+    AttachmentPrivate1(const Mesh &mesh, const Skeleton &skeleton, const vector<PVector3> &match, const VisibilityTester *tester,
 		double initialHeatWeight)
     {
         int i, j;
@@ -75,19 +75,19 @@ public:
         for(i = 0; i < nv; ++i) {
             boneDists[i].resize(bones, -1);
             boneVis[i].resize(bones);
-            Vector3 cPos = mesh.vertices[i].pos;
+            PVector3 cPos = mesh.vertices[i].pos;
 
-            vector<Vector3> normals;
+            vector<PVector3> normals;
             for(j = 0; j < (int)edges[i].size(); ++j) {
                 int nj = (j + 1) % edges[i].size();
-                Vector3 v1 = mesh.vertices[edges[i][j]].pos - cPos;
-                Vector3 v2 = mesh.vertices[edges[i][nj]].pos - cPos;
+                PVector3 v1 = mesh.vertices[edges[i][j]].pos - cPos;
+                PVector3 v2 = mesh.vertices[edges[i][nj]].pos - cPos;
                 normals.push_back((v1 % v2).normalize());
             }
 
             double minDist = 1e37;
             for(j = 1; j <= bones; ++j) {
-                const Vector3 &v1 = match[j], &v2 = match[skeleton.fPrev()[j]];
+                const PVector3 &v1 = match[j], &v2 = match[skeleton.fPrev()[j]];
                 boneDists[i][j - 1] = sqrt(distsqToSeg(cPos, v1, v2));
                 minDist = min(boneDists[i][j - 1], minDist);
             }
@@ -97,8 +97,8 @@ public:
                 if(boneDists[i][j - 1] > minDist * 1.0001)
                     continue;
 
-                const Vector3 &v1 = match[j], &v2 = match[skeleton.fPrev()[j]];
-                Vector3 p = projToSeg(cPos, v1, v2);
+                const PVector3 &v1 = match[j], &v2 = match[skeleton.fPrev()[j]];
+                PVector3 p = projToSeg(cPos, v1, v2);
                 boneVis[i][j - 1] = tester->canSee(cPos, p) && vectorInCone(cPos - p, normals);
             }
         }
@@ -141,10 +141,10 @@ public:
                 int nj = (j + 1) % edges[i].size();
                 int pj = (j + edges[i].size() - 1) % edges[i].size();
 
-                Vector3 v1 = mesh.vertices[i].pos - mesh.vertices[edges[i][pj]].pos;
-                Vector3 v2 = mesh.vertices[edges[i][j]].pos - mesh.vertices[edges[i][pj]].pos;
-                Vector3 v3 = mesh.vertices[i].pos - mesh.vertices[edges[i][nj]].pos;
-                Vector3 v4 = mesh.vertices[edges[i][j]].pos - mesh.vertices[edges[i][nj]].pos;
+                PVector3 v1 = mesh.vertices[i].pos - mesh.vertices[edges[i][pj]].pos;
+                PVector3 v2 = mesh.vertices[edges[i][j]].pos - mesh.vertices[edges[i][pj]].pos;
+                PVector3 v3 = mesh.vertices[i].pos - mesh.vertices[edges[i][nj]].pos;
+                PVector3 v4 = mesh.vertices[edges[i][j]].pos - mesh.vertices[edges[i][nj]].pos;
 
                 double cot1 = (v1 * v2) / (1e-6 + (v1 % v2).length());
                 double cot2 = (v3 * v4) / (1e-6 + (v3 % v4).length());
@@ -206,7 +206,7 @@ public:
             return out; //error
 
         for(i = 0; i < nv; ++i) {
-            Vector3 newPos;
+            PVector3 newPos;
             int j;
             for(j = 0; j < (int)nzweights[i].size(); ++j) {
                 newPos += ((transforms[nzweights[i][j].first] * out.vertices[i].pos) * nzweights[i][j].second);
@@ -219,7 +219,7 @@ public:
         return out;
     }
 
-    Vector<double, -1> getWeights(int i) const { return weights[i]; }
+    PVector<double, -1> getWeights(int i) const { return weights[i]; }
 
     AttachmentPrivate *clone() const
     {
@@ -229,7 +229,7 @@ public:
     }
 
 private:
-    vector<Vector<double, -1> > weights;
+    vector<PVector<double, -1> > weights;
     vector<vector<pair<int, double> > > nzweights; //sparse representation
 };
 
@@ -244,14 +244,14 @@ Attachment::Attachment(const Attachment &att)
     a = att.a->clone();
 }
 
-Vector<double, -1> Attachment::getWeights(int i) const { return a->getWeights(i); }
+PVector<double, -1> Attachment::getWeights(int i) const { return a->getWeights(i); }
 
 Mesh Attachment::deform(const Mesh &mesh, const vector<Transform<> > &transforms) const
 {
     return a->deform(mesh, transforms);
 }
 
-Attachment::Attachment(const Mesh &mesh, const Skeleton &skeleton, const vector<Vector3> &match, const VisibilityTester *tester,
+Attachment::Attachment(const Mesh &mesh, const Skeleton &skeleton, const vector<PVector3> &match, const VisibilityTester *tester,
 					   double initialHeatWeight)
 {
     a = new AttachmentPrivate1(mesh, skeleton, match, tester, initialHeatWeight);

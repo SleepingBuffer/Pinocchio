@@ -81,9 +81,9 @@ public:
             int idx[Dim + 1];
             for(i = 0; i < Dim + 1; ++i)
                 idx[i] = 0;
-            Vector<double, Dim> center = rect.getCenter();
+            PVector<double, Dim> center = rect.getCenter();
             while(idx[Dim] == 0) {
-                Vector<double, Dim> cur;
+                PVector<double, Dim> cur;
                 bool anyMid = false;
                 for(i = 0; i < Dim; ++i) {
                     switch(idx[i]) {
@@ -115,13 +115,13 @@ public:
         }
     }
 
-    template<class Real> Real evaluate(const Vector<Real, Dim> &v)
+    template<class Real> Real evaluate(const PVector<Real, Dim> &v)
     {
         if(node->getChild(0) == NULL) {
             return super::evaluate((v - node->getRect().getLo()).apply(divides<Real>(),
                                                                        node->getRect().getSize()));
         }
-        Vector<Real, Dim> center = node->getRect().getCenter();
+        PVector<Real, Dim> center = node->getRect().getCenter();
         int idx = 0;
         for(int i = 0; i < Dim; ++i)
             if(v[i] > center[i])
@@ -135,7 +135,7 @@ public:
         if(r.isEmpty())
             return Real();
         if(node->getChild(0) == NULL) {
-            Vector<Real, Dim> corner = node->getRect().getLo(), size = node->getRect().getSize();
+            PVector<Real, Dim> corner = node->getRect().getLo(), size = node->getRect().getSize();
             Rect<Real, Dim> adjRect((r.getLo() - corner).apply(divides<Real>(), size),
                                     (r.getHi() - corner).apply(divides<Real>(), size));
             return Real(node->getRect().getContent()) * super::integrate(adjRect);
@@ -182,14 +182,14 @@ private:
     class DistObjEval
     {
     public:
-        DistObjEval(const ObjectProjector<3, Tri3Object> &inProj, const Mesh &m) : proj(inProj), mint(m, Vector3(1, 0, 0))
+        DistObjEval(const ObjectProjector<3, Tri3Object> &inProj, const Mesh &m) : proj(inProj), mint(m, PVector3(1, 0, 0))
         {
             level = 0;
-            rects[0] = Rect3(Vector3(), Vector3(1.));
+            rects[0] = Rect3(PVector3(), PVector3(1.));
             inside[0] = 0;
         }
 
-        double operator()(const Vector3 &vec) const
+        double operator()(const PVector3 &vec) const
         {
             unsigned int cur = ROUND(vec[0] * 1023.) + 1024 * (ROUND(vec[1] * 1023.) + 1024 * ROUND(vec[2] * 1023.));
             unsigned int sz = cache.size();
@@ -219,12 +219,12 @@ private:
         }
 
     private:
-        double compute(const Vector3 &vec) const
+        double compute(const PVector3 &vec) const
         {
             int i, ins = inside[level];
             if(!ins) {
                 ins = 1;
-                vector<Vector3> isecs = mint.intersect(vec);
+                vector<PVector3> isecs = mint.intersect(vec);
                 for(i = 0; i < (int)isecs.size(); ++i) {
                     if(isecs[i][0] > vec[0])
                         ins = -ins;
@@ -247,7 +247,7 @@ private:
     public:
         PointObjDistEval(const ObjectProjector<3, Vec3Object> &inProj, const RootNode *inDTree) : proj(inProj), dTree(inDTree) {}
 
-        double operator()(const Vector3 &vec) const
+        double operator()(const PVector3 &vec) const
         {
             unsigned int cur = ROUND(vec[0] * 1023.) + 1024 * (ROUND(vec[1] * 1023.) + 1024 * ROUND(vec[2] * 1023.));
             unsigned int sz = cache.size();

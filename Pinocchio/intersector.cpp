@@ -25,9 +25,9 @@
 
 static const int cells = 200;
 
-void Intersector::getIndex(const Vector2 &pt, int &x, int &y) const
+void Intersector::getIndex(const PVector2 &pt, int &x, int &y) const
 {
-    Vector2 c = (pt - bounds.getLo()).apply(divides<double>(), bounds.getSize());
+    PVector2 c = (pt - bounds.getLo()).apply(divides<double>(), bounds.getSize());
     x = int(c[0] * double(cells));
     y = int(c[0] * double(cells));
     x = max(0, min(cells - 1, x));
@@ -46,7 +46,7 @@ void Intersector::init()
     points.resize(vtc.size());
     sNormals.resize(edg.size() / 3);
     for(i = 0; i < (int)vtc.size(); ++i) {
-        points[i] = Vector2(vtc[i].pos * v1, vtc[i].pos * v2);
+        points[i] = PVector2(vtc[i].pos * v1, vtc[i].pos * v2);
     }
     
     bounds = Rect2(points.begin(), points.end());
@@ -65,25 +65,25 @@ void Intersector::init()
             triangles[j * cells + k].push_back(i);
         }
         
-        Vector3 cross = (vtc[edg[i + 1].vertex].pos - vtc[edg[i].vertex].pos) % (vtc[edg[i + 2].vertex].pos - vtc[edg[i].vertex].pos);
+        PVector3 cross = (vtc[edg[i + 1].vertex].pos - vtc[edg[i].vertex].pos) % (vtc[edg[i + 2].vertex].pos - vtc[edg[i].vertex].pos);
         j = i / 3;
         sNormals[j] = cross.normalize();
         if(fabs(sNormals[j] * dir) <= 1e-8)
-            sNormals[j] = Vector3(); //zero if coplanar
+            sNormals[j] = PVector3(); //zero if coplanar
         else
             sNormals[j] = sNormals[j] / (sNormals[j] * dir); //prescaled for intersection
     }
 }
 
-vector<Vector3> Intersector::intersect(const Vector3 &pt, vector<int> *outIndices) const
+vector<PVector3> Intersector::intersect(const PVector3 &pt, vector<int> *outIndices) const
 {
     int i;
     const vector<MeshVertex> &vtc = mesh->vertices;
     const vector<MeshEdge> &edg = mesh->edges;
     
-    vector<Vector3> out;
+    vector<PVector3> out;
     
-    Vector2 pt2(pt * v1, pt * v2);
+    PVector2 pt2(pt * v1, pt * v2);
     if(!bounds.contains(pt2))
         return out; //no intersections
     
@@ -99,8 +99,8 @@ vector<Vector3> Intersector::intersect(const Vector3 &pt, vector<int> *outIndice
             idx[j] = edg[tris[i] + j].vertex;
         }
         for(j = 0; j < 3; ++j) {
-            Vector2 d1 = points[idx[(j + 1) % 3]] - points[idx[j]];
-            Vector2 d2 = pt2 - points[idx[j]];
+            PVector2 d1 = points[idx[(j + 1) % 3]] - points[idx[j]];
+            PVector2 d2 = pt2 - points[idx[j]];
             sign[j] = SIGN(d1[0] * d2[1] - d1[1] * d2[0]);
         }
         if(sign[0] != sign[1] || sign[1] != sign[2])
@@ -110,9 +110,9 @@ vector<Vector3> Intersector::intersect(const Vector3 &pt, vector<int> *outIndice
 	       outIndices->push_back(tris[i]);
         
         //now compute the plane intersection
-        const Vector3 &n = sNormals[tris[i] / 3];
+        const PVector3 &n = sNormals[tris[i] / 3];
         if(n.lengthsq() == 0) { //triangle and line coplanar --just project the triangle center to the line and hope for the best
-            Vector3 ctr = (vtc[idx[0]].pos + vtc[idx[1]].pos + vtc[idx[2]].pos) * (1. / 3.);
+            PVector3 ctr = (vtc[idx[0]].pos + vtc[idx[1]].pos + vtc[idx[2]].pos) * (1. / 3.);
             out.push_back(projToLine(ctr, pt, dir));
             continue;
         }

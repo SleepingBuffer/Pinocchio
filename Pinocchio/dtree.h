@@ -27,7 +27,7 @@ class DNode : public Data
 {
 public:
     typedef DNode<Data, Dim> Self;
-    typedef Vector<double, Dim> Vec;
+    typedef PVector<double, Dim> Vec;
     typedef Rect<double, Dim> MyRect;
 
     int countNodes() const
@@ -102,7 +102,7 @@ public:
     typedef DNode<Data, Dim> Node;
     typedef DRootNode<Data, Dim, Indexer> Self;
     typedef Indexer<Node, Dim> MyIndexer;
-    typedef Vector<double, Dim> Vec;
+    typedef PVector<double, Dim> Vec;
     typedef Rect<double, Dim> MyRect;
 
     DRootNode(MyRect r = MyRect(Vec(), Vec().apply(bind2nd(plus<double>(), 1.)))) : Node(r)

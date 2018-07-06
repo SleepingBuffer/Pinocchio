@@ -45,12 +45,11 @@ public:
     
     void scale(double factor);
     
-protected:
     void initCompressed();
     
     //help for creation
     map<string, int> jointNames;
-    void makeJoint(const string &name, const Vector3 &pos, const string &previous = string());
+    void makeJoint(const string &name, const PVector3 &pos, const string &previous = string());
     void makeSymmetric(const string &name1, const string &name2);
     void setFoot(const string &name);
     void setFat(const string &name);

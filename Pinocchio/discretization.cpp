@@ -42,9 +42,9 @@ TreeType *constructDistanceField(const Mesh &m, double tol)
 {
     vector<Tri3Object> triobjvec;
     for(int i = 0; i < (int)m.edges.size(); i += 3) {
-        Vector3 v1 = m.vertices[m.edges[i].vertex].pos;
-        Vector3 v2 = m.vertices[m.edges[i + 1].vertex].pos;
-        Vector3 v3 = m.vertices[m.edges[i + 2].vertex].pos;
+        PVector3 v1 = m.vertices[m.edges[i].vertex].pos;
+        PVector3 v2 = m.vertices[m.edges[i + 1].vertex].pos;
+        PVector3 v3 = m.vertices[m.edges[i + 2].vertex].pos;
         
         triobjvec.push_back(Tri3Object(v1, v2, v3));
     }
@@ -58,28 +58,28 @@ TreeType *constructDistanceField(const Mesh &m, double tol)
     return out;
 }
 
-double getMinDot(TreeType *distanceField, const Vector3 &c, double step)
+double getMinDot(TreeType *distanceField, const PVector3 &c, double step)
 {
     typedef Deriv<double, 3> D;
-    typedef Vector<D, 3> VD;
+    typedef PVector<D, 3> VD;
     
     int i, j;
-    vector<Vector3> vecs;
-    vecs.push_back(Vector3(step, step, step));
-    vecs.push_back(Vector3(step, step, -step));
-    vecs.push_back(Vector3(step, -step, step));
-    vecs.push_back(Vector3(step, -step, -step));
-    vecs.push_back(Vector3(-step, step, step));
-    vecs.push_back(Vector3(-step, step, -step));
-    vecs.push_back(Vector3(-step, -step, step));
-    vecs.push_back(Vector3(-step, -step, -step));
+    vector<PVector3> vecs;
+    vecs.push_back(PVector3(step, step, step));
+    vecs.push_back(PVector3(step, step, -step));
+    vecs.push_back(PVector3(step, -step, step));
+    vecs.push_back(PVector3(step, -step, -step));
+    vecs.push_back(PVector3(-step, step, step));
+    vecs.push_back(PVector3(-step, step, -step));
+    vecs.push_back(PVector3(-step, -step, step));
+    vecs.push_back(PVector3(-step, -step, -step));
     
     for(i = 0; i < (int)vecs.size(); ++i) {
         vecs[i] += c;
         VD vd = VD(D(vecs[i][0], 0), D(vecs[i][1], 1), D(vecs[i][2], 2));
         
         D result = distanceField->locate(vecs[i])->evaluate(vd);
-        vecs[i] = Vector3(result.getDeriv(0), result.getDeriv(1), result.getDeriv(2)).normalize();
+        vecs[i] = PVector3(result.getDeriv(0), result.getDeriv(1), result.getDeriv(2)).normalize();
     }
     
     double minDot = 1.;
@@ -91,14 +91,14 @@ double getMinDot(TreeType *distanceField, const Vector3 &c, double step)
     return minDot;
 }
 
-bool sphereComp(const Sphere &s1, const Sphere &s2) { return s1.radius > s2.radius; }
+bool sphereComp(const PSphere &s1, const PSphere &s2) { return s1.radius > s2.radius; }
 
 //samples the distance field to find spheres on the medial surface
 //output is sorted by radius in decreasing order
-vector<Sphere> sampleMedialSurface(TreeType *distanceField, double tol)
+vector<PSphere> sampleMedialSurface(TreeType *distanceField, double tol)
 {
     int i;
-    vector<Sphere> out;
+    vector<PSphere> out;
 
     vector<OctTreeNode *> todo;
     todo.push_back(distanceField);
@@ -116,7 +116,7 @@ vector<Sphere> sampleMedialSurface(TreeType *distanceField, double tol)
         //we are at octree leaf
         Rect3 r = cur->getRect();
         double rad = r.getSize().length() / 2.;
-        Vector3 c = r.getCenter();
+        PVector3 c = r.getCenter();
         double dot = getMinDot(distanceField, c, rad);
         if(dot > 0.)
             continue;
@@ -124,26 +124,26 @@ vector<Sphere> sampleMedialSurface(TreeType *distanceField, double tol)
         //we are likely near medial surface
         double step = tol;
         double x, y;
-        vector<Vector3> pts;
+        vector<PVector3> pts;
         double sz = r.getSize()[0];
         for(x = 0; x <= sz; x += step) for(y = 0; y <= sz; y += step) {
-            pts.push_back(r.getLo() + Vector3(x, y, 0));
+            pts.push_back(r.getLo() + PVector3(x, y, 0));
             if(y != 0.)
-                pts.push_back(r.getLo() + Vector3(x, 0, y));
+                pts.push_back(r.getLo() + PVector3(x, 0, y));
             if(x != 0. && y != 0.)
-                pts.push_back(r.getLo() + Vector3(0, x, y));
+                pts.push_back(r.getLo() + PVector3(0, x, y));
         }
         
         //pts now contains a grid on 3 of the octree cell faces (that's enough)
         for(i = 0; i < (int)pts.size(); ++i) {
-            Vector3 &p = pts[i];
+            PVector3 &p = pts[i];
             double dist = -distanceField->locate(p)->evaluate(p);
             if(dist <= 2. * step)
                 continue; //we want to be well inside
             double dot = getMinDot(distanceField, p, step * 0.001);
             if(dot > 0.0)
                 continue;
-            out.push_back(Sphere(p, dist));
+            out.push_back(PSphere(p, dist));
         }
     }
     
@@ -155,10 +155,10 @@ vector<Sphere> sampleMedialSurface(TreeType *distanceField, double tol)
 }
 
 //takes sorted medial surface samples and sparsifies the vector
-vector<Sphere> packSpheres(const vector<Sphere> &samples, int maxSpheres)
+vector<PSphere> packSpheres(const vector<PSphere> &samples, int maxSpheres)
 {
     int i, j;
-    vector<Sphere> out;
+    vector<PSphere> out;
 
     for(i = 0; i < (int)samples.size(); ++i) {
         for(j = 0; j < (int)out.size(); ++j) {
@@ -176,12 +176,12 @@ vector<Sphere> packSpheres(const vector<Sphere> &samples, int maxSpheres)
     return out;
 }
 
-double getMaxDist(TreeType *distanceField, const Vector3 &v1, const Vector3 &v2, double maxAllowed)
+double getMaxDist(TreeType *distanceField, const PVector3 &v1, const PVector3 &v2, double maxAllowed)
 {
     double maxDist = -1e37;
-    Vector3 diff = (v2 - v1) / 100.;
+    PVector3 diff = (v2 - v1) / 100.;
     for(int k = 0; k < 101; ++k) {
-        Vector3 pt = v1 + diff * double(k);
+        PVector3 pt = v1 + diff * double(k);
         maxDist = max(maxDist, distanceField->locate(pt)->evaluate(pt));
         if(maxDist > maxAllowed)
             break;
@@ -190,7 +190,7 @@ double getMaxDist(TreeType *distanceField, const Vector3 &v1, const Vector3 &v2,
 }
 
 //constructs graph on packed sphere centers
-PtGraph connectSamples(TreeType *distanceField, const vector<Sphere> &spheres)
+PtGraph connectSamples(TreeType *distanceField, const vector<PSphere> &spheres)
 {
     int i, j;
     PtGraph out;
@@ -201,7 +201,7 @@ PtGraph connectSamples(TreeType *distanceField, const vector<Sphere> &spheres)
         
     for(i = 1; i < (int)spheres.size(); ++i) for(j = 0; j < i; ++j) {
         int k;
-        Vector3 ctr = (spheres[i].center + spheres[j].center) * 0.5;
+        PVector3 ctr = (spheres[i].center + spheres[j].center) * 0.5;
         double radsq = (spheres[i].center - spheres[j].center).lengthsq() * 0.25;
         if(radsq < SQR(spheres[i].radius + spheres[j].radius) * 0.25) { //if spheres intersect, there should be an edge
             out.edges[i].push_back(j);

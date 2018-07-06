@@ -27,7 +27,7 @@ struct PinocchioOutput
 {
     PinocchioOutput() : attachment(NULL) {}
 
-    vector<Vector3> embedding;
+    vector<PVector3> embedding;
     Attachment *attachment; //user responsible for deletion
 };
 
@@ -47,39 +47,39 @@ static const double defaultTreeTol = 0.003;
 //constructs a distance field on an octree--user responsible for deleting output
 TreeType PINOCCHIO_API *constructDistanceField(const Mesh &m, double tol = defaultTreeTol);
 
-struct Sphere {
-    Sphere() : radius(0.) {}
-    Sphere(const Vector3 &inC, double inR) : center(inC), radius(inR) {}
+struct PSphere {
+    PSphere() : radius(0.) {}
+    PSphere(const PVector3 &inC, double inR) : center(inC), radius(inR) {}
 
-    Vector3 center;
+    PVector3 center;
     double radius;
 };
 
 //samples the distance field to find spheres on the medial surface
 //output is sorted by radius in decreasing order
-vector<Sphere> PINOCCHIO_API sampleMedialSurface(TreeType *distanceField, double tol = defaultTreeTol);
+vector<PSphere> PINOCCHIO_API sampleMedialSurface(TreeType *distanceField, double tol = defaultTreeTol);
 
 //takes sorted medial surface samples and sparsifies the vector
-vector<Sphere> PINOCCHIO_API packSpheres(const vector<Sphere> &samples, int maxSpheres = 1000);
+vector<PSphere> PINOCCHIO_API packSpheres(const vector<PSphere> &samples, int maxSpheres = 1000);
 
 //constructs graph on packed sphere centers
-PtGraph PINOCCHIO_API connectSamples(TreeType *distanceField, const vector<Sphere> &spheres);
+PtGraph PINOCCHIO_API connectSamples(TreeType *distanceField, const vector<PSphere> &spheres);
 
 //finds which joints can be embedded into which sphere centers
-vector<vector<int> > PINOCCHIO_API computePossibilities(const PtGraph &graph, const vector<Sphere> &spheres,
+vector<vector<int> > PINOCCHIO_API computePossibilities(const PtGraph &graph, const vector<PSphere> &spheres,
                                                         const Skeleton &skeleton);
 
 //finds discrete embedding
-vector<int> PINOCCHIO_API discreteEmbed(const PtGraph &graph, const vector<Sphere> &spheres,
+vector<int> PINOCCHIO_API discreteEmbed(const PtGraph &graph, const vector<PSphere> &spheres,
                                         const Skeleton &skeleton, const vector<vector<int> > &possibilities);
 
 //reinserts joints for unreduced skeleton
-vector<Vector3> PINOCCHIO_API splitPaths(const vector<int> &discreteEmbedding, const PtGraph &graph,
+vector<PVector3> PINOCCHIO_API splitPaths(const vector<int> &discreteEmbedding, const PtGraph &graph,
                                          const Skeleton &skeleton);
 
 //refines embedding
-vector<Vector3> PINOCCHIO_API refineEmbedding(TreeType *distanceField, const vector<Vector3> &medialSurface,
-                                              const vector<Vector3> &initialEmbedding, const Skeleton &skeleton);
+vector<PVector3> PINOCCHIO_API refineEmbedding(TreeType *distanceField, const vector<PVector3> &medialSurface,
+                                              const vector<PVector3> &initialEmbedding, const Skeleton &skeleton);
 
 //to compute the attachment, create a new Attachment object
 

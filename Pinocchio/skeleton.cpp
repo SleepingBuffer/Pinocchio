@@ -93,7 +93,7 @@ void Skeleton::scale(double factor)
     }
 }
 
-void Skeleton::makeJoint(const string &name, const Vector3 &pos, const string &previous)
+void Skeleton::makeJoint(const string &name, const PVector3 &pos, const string &previous)
 {
     int cur = fSymV.size();
     fSymV.push_back(-1);
@@ -138,28 +138,28 @@ void Skeleton::setFat(const string &name)
 HumanSkeleton::HumanSkeleton()
 {
     //order of makeJoint calls is very important
-    makeJoint("shoulders",  Vector3(0., 0.5, 0.));                          //0
-    makeJoint("back",       Vector3(0., 0.15, 0.),      "shoulders");       //1
-    makeJoint("hips",       Vector3(0., 0., 0.),        "back");            //2
-    makeJoint("head",       Vector3(0., 0.7, 0.),       "shoulders");       //3
+    makeJoint("shoulders",  PVector3(0., 0.5, 0.));                          //0
+    makeJoint("back",       PVector3(0., 0.15, 0.),      "shoulders");       //1
+    makeJoint("hips",       PVector3(0., 0., 0.),        "back");            //2
+    makeJoint("head",       PVector3(0., 0.7, 0.),       "shoulders");       //3
     
-    makeJoint("lthigh",     Vector3(-0.1, 0., 0.),      "hips");            //4
-    makeJoint("lknee",      Vector3(-0.15, -0.35, 0.),  "lthigh");          //5
-    makeJoint("lankle",      Vector3(-0.15, -0.8, 0.),  "lknee");           //6
-    makeJoint("lfoot",      Vector3(-0.15, -0.8, 0.1),  "lankle");          //7
+    makeJoint("lthigh",     PVector3(-0.1, 0., 0.),      "hips");            //4
+    makeJoint("lknee",      PVector3(-0.15, -0.35, 0.),  "lthigh");          //5
+    makeJoint("lankle",      PVector3(-0.15, -0.8, 0.),  "lknee");           //6
+    makeJoint("lfoot",      PVector3(-0.15, -0.8, 0.1),  "lankle");          //7
     
-    makeJoint("rthigh",     Vector3(0.1, 0., 0.),       "hips");            //8
-    makeJoint("rknee",      Vector3(0.15, -0.35, 0.),   "rthigh");          //9
-    makeJoint("rankle",      Vector3(0.15, -0.8, 0.),   "rknee");           //10
-    makeJoint("rfoot",      Vector3(0.15, -0.8, 0.1),   "rankle");          //11
+    makeJoint("rthigh",     PVector3(0.1, 0., 0.),       "hips");            //8
+    makeJoint("rknee",      PVector3(0.15, -0.35, 0.),   "rthigh");          //9
+    makeJoint("rankle",      PVector3(0.15, -0.8, 0.),   "rknee");           //10
+    makeJoint("rfoot",      PVector3(0.15, -0.8, 0.1),   "rankle");          //11
     
-    makeJoint("lshoulder",  Vector3(-0.2, 0.5, 0.),     "shoulders");       //12
-    makeJoint("lelbow",     Vector3(-0.4, 0.25, 0.075), "lshoulder");       //13
-    makeJoint("lhand",      Vector3(-0.6, 0.0, 0.15),   "lelbow");          //14
+    makeJoint("lshoulder",  PVector3(-0.2, 0.5, 0.),     "shoulders");       //12
+    makeJoint("lelbow",     PVector3(-0.4, 0.25, 0.075), "lshoulder");       //13
+    makeJoint("lhand",      PVector3(-0.6, 0.0, 0.15),   "lelbow");          //14
     
-    makeJoint("rshoulder",  Vector3(0.2, 0.5, 0.),      "shoulders");       //15
-    makeJoint("relbow",     Vector3(0.4, 0.25, 0.075),  "rshoulder");       //16
-    makeJoint("rhand",      Vector3(0.6, 0.0, 0.15),    "relbow");          //17
+    makeJoint("rshoulder",  PVector3(0.2, 0.5, 0.),      "shoulders");       //15
+    makeJoint("relbow",     PVector3(0.4, 0.25, 0.075),  "rshoulder");       //16
+    makeJoint("rhand",      PVector3(0.6, 0.0, 0.15),    "relbow");          //17
     
     //symmetry
     makeSymmetric("lthigh", "rthigh");
@@ -184,29 +184,29 @@ HumanSkeleton::HumanSkeleton()
 QuadSkeleton::QuadSkeleton()
 {
     //order of makeJoint calls is very important
-    makeJoint("shoulders",  Vector3(0., 0., 0.5));
-    makeJoint("back",       Vector3(0., 0., 0.),         "shoulders");
-    makeJoint("hips",       Vector3(0., 0., -0.5),       "back");
-    makeJoint("neck",       Vector3(0., 0.2, 0.63),      "shoulders");
-    makeJoint("head",       Vector3(0., 0.2, 0.9),       "neck");
+    makeJoint("shoulders",  PVector3(0., 0., 0.5));
+    makeJoint("back",       PVector3(0., 0., 0.),         "shoulders");
+    makeJoint("hips",       PVector3(0., 0., -0.5),       "back");
+    makeJoint("neck",       PVector3(0., 0.2, 0.63),      "shoulders");
+    makeJoint("head",       PVector3(0., 0.2, 0.9),       "neck");
     
-    makeJoint("lthigh",     Vector3(-0.15, 0., -0.5),     "hips");
-    makeJoint("lhknee",     Vector3(-0.2, -0.4, -0.5),   "lthigh");
-    makeJoint("lhfoot",     Vector3(-0.2, -0.8, -0.5),   "lhknee");
+    makeJoint("lthigh",     PVector3(-0.15, 0., -0.5),     "hips");
+    makeJoint("lhknee",     PVector3(-0.2, -0.4, -0.5),   "lthigh");
+    makeJoint("lhfoot",     PVector3(-0.2, -0.8, -0.5),   "lhknee");
     
-    makeJoint("rthigh",     Vector3(0.15, 0., -0.5),      "hips");
-    makeJoint("rhknee",     Vector3(0.2, -0.4, -0.5),    "rthigh");
-    makeJoint("rhfoot",     Vector3(0.2, -0.8, -0.5),    "rhknee");
+    makeJoint("rthigh",     PVector3(0.15, 0., -0.5),      "hips");
+    makeJoint("rhknee",     PVector3(0.2, -0.4, -0.5),    "rthigh");
+    makeJoint("rhfoot",     PVector3(0.2, -0.8, -0.5),    "rhknee");
     
-    makeJoint("lshoulder",  Vector3(-0.2, 0., 0.5),      "shoulders");
-    makeJoint("lfknee",     Vector3(-0.2, -0.4, 0.5),    "lshoulder");
-    makeJoint("lffoot",      Vector3(-0.2, -0.8, 0.5),   "lfknee");
+    makeJoint("lshoulder",  PVector3(-0.2, 0., 0.5),      "shoulders");
+    makeJoint("lfknee",     PVector3(-0.2, -0.4, 0.5),    "lshoulder");
+    makeJoint("lffoot",      PVector3(-0.2, -0.8, 0.5),   "lfknee");
     
-    makeJoint("rshoulder",  Vector3(0.2, 0.0, 0.5),      "shoulders");
-    makeJoint("rfknee",     Vector3(0.2, -0.4, 0.5),     "rshoulder");
-    makeJoint("rffoot",      Vector3(0.2, -0.8, 0.5),    "rfknee");
+    makeJoint("rshoulder",  PVector3(0.2, 0.0, 0.5),      "shoulders");
+    makeJoint("rfknee",     PVector3(0.2, -0.4, 0.5),     "rshoulder");
+    makeJoint("rffoot",      PVector3(0.2, -0.8, 0.5),    "rfknee");
     
-    makeJoint("tail",       Vector3(0., 0., -0.7),       "hips");
+    makeJoint("tail",       PVector3(0., 0., -0.7),       "hips");
     
     //symmetry
     makeSymmetric("lthigh", "rthigh");
@@ -232,31 +232,31 @@ QuadSkeleton::QuadSkeleton()
 HorseSkeleton::HorseSkeleton()
 {
     //order of makeJoint calls is very important
-    makeJoint("shoulders",  Vector3(0., 0., 0.5));
-    makeJoint("back",       Vector3(0., 0., 0.),         "shoulders");
-    makeJoint("hips",       Vector3(0., 0., -0.5),       "back");
-    makeJoint("neck",       Vector3(0., 0.2, 0.63),      "shoulders");
-    makeJoint("head",       Vector3(0., 0.2, 0.9),       "neck");
+    makeJoint("shoulders",  PVector3(0., 0., 0.5));
+    makeJoint("back",       PVector3(0., 0., 0.),         "shoulders");
+    makeJoint("hips",       PVector3(0., 0., -0.5),       "back");
+    makeJoint("neck",       PVector3(0., 0.2, 0.63),      "shoulders");
+    makeJoint("head",       PVector3(0., 0.2, 0.9),       "neck");
     
-    makeJoint("lthigh",     Vector3(-0.15, 0., -0.5),     "hips");
-    makeJoint("lhknee",     Vector3(-0.2, -0.2, -0.45),  "lthigh");
-    makeJoint("lhheel",     Vector3(-0.2, -0.4, -0.5),   "lhknee");
-    makeJoint("lhfoot",     Vector3(-0.2, -0.8, -0.5),   "lhheel");
+    makeJoint("lthigh",     PVector3(-0.15, 0., -0.5),     "hips");
+    makeJoint("lhknee",     PVector3(-0.2, -0.2, -0.45),  "lthigh");
+    makeJoint("lhheel",     PVector3(-0.2, -0.4, -0.5),   "lhknee");
+    makeJoint("lhfoot",     PVector3(-0.2, -0.8, -0.5),   "lhheel");
     
-    makeJoint("rthigh",     Vector3(0.15, 0., -0.5),      "hips");
-    makeJoint("rhknee",     Vector3(0.2, -0.2, -0.45),   "rthigh");
-    makeJoint("rhheel",     Vector3(0.2, -0.4, -0.5),    "rhknee");
-    makeJoint("rhfoot",     Vector3(0.2, -0.8, -0.5),    "rhheel");
+    makeJoint("rthigh",     PVector3(0.15, 0., -0.5),      "hips");
+    makeJoint("rhknee",     PVector3(0.2, -0.2, -0.45),   "rthigh");
+    makeJoint("rhheel",     PVector3(0.2, -0.4, -0.5),    "rhknee");
+    makeJoint("rhfoot",     PVector3(0.2, -0.8, -0.5),    "rhheel");
     
-    makeJoint("lshoulder",  Vector3(-0.2, 0., 0.5),      "shoulders");
-    makeJoint("lfknee",     Vector3(-0.2, -0.4, 0.5),    "lshoulder");
-    makeJoint("lffoot",      Vector3(-0.2, -0.8, 0.5),   "lfknee");
+    makeJoint("lshoulder",  PVector3(-0.2, 0., 0.5),      "shoulders");
+    makeJoint("lfknee",     PVector3(-0.2, -0.4, 0.5),    "lshoulder");
+    makeJoint("lffoot",      PVector3(-0.2, -0.8, 0.5),   "lfknee");
     
-    makeJoint("rshoulder",  Vector3(0.2, 0.0, 0.5),      "shoulders");
-    makeJoint("rfknee",     Vector3(0.2, -0.4, 0.5),     "rshoulder");
-    makeJoint("rffoot",      Vector3(0.2, -0.8, 0.5),    "rfknee");
+    makeJoint("rshoulder",  PVector3(0.2, 0.0, 0.5),      "shoulders");
+    makeJoint("rfknee",     PVector3(0.2, -0.4, 0.5),     "rshoulder");
+    makeJoint("rffoot",      PVector3(0.2, -0.8, 0.5),    "rfknee");
     
-    makeJoint("tail",       Vector3(0., 0., -0.7),       "hips");
+    makeJoint("tail",       PVector3(0., 0., -0.7),       "hips");
     
     //symmetry
     makeSymmetric("lthigh", "rthigh");
@@ -283,39 +283,39 @@ HorseSkeleton::HorseSkeleton()
 CentaurSkeleton::CentaurSkeleton()
 {
     //order of makeJoint calls is very important
-    makeJoint("shoulders",  Vector3(0., 0., 0.5));                      //0
-    makeJoint("back",       Vector3(0., 0., 0.),         "shoulders");  //1
-    makeJoint("hips",       Vector3(0., 0., -0.5),       "back");       //2
+    makeJoint("shoulders",  PVector3(0., 0., 0.5));                      //0
+    makeJoint("back",       PVector3(0., 0., 0.),         "shoulders");  //1
+    makeJoint("hips",       PVector3(0., 0., -0.5),       "back");       //2
 
-    makeJoint("hback",      Vector3(0., 0.25, 0.5),      "shoulders");  //3
-    makeJoint("hshoulders", Vector3(0., 0.5, 0.5),       "hback");      //4
-    makeJoint("head",       Vector3(0., 0.7, 0.5),       "hshoulders"); //5
+    makeJoint("hback",      PVector3(0., 0.25, 0.5),      "shoulders");  //3
+    makeJoint("hshoulders", PVector3(0., 0.5, 0.5),       "hback");      //4
+    makeJoint("head",       PVector3(0., 0.7, 0.5),       "hshoulders"); //5
     
-    makeJoint("lthigh",     Vector3(-0.15, 0., -0.5),    "hips");       //6
-    makeJoint("lhknee",     Vector3(-0.2, -0.4, -0.45),  "lthigh");     //7
-    makeJoint("lhfoot",     Vector3(-0.2, -0.8, -0.5),   "lhknee");     //8
+    makeJoint("lthigh",     PVector3(-0.15, 0., -0.5),    "hips");       //6
+    makeJoint("lhknee",     PVector3(-0.2, -0.4, -0.45),  "lthigh");     //7
+    makeJoint("lhfoot",     PVector3(-0.2, -0.8, -0.5),   "lhknee");     //8
     
-    makeJoint("rthigh",     Vector3(0.15, 0., -0.5),     "hips");       //9
-    makeJoint("rhknee",     Vector3(0.2, -0.4, -0.45),   "rthigh");     //10
-    makeJoint("rhfoot",     Vector3(0.2, -0.8, -0.5),    "rhknee");     //11
+    makeJoint("rthigh",     PVector3(0.15, 0., -0.5),     "hips");       //9
+    makeJoint("rhknee",     PVector3(0.2, -0.4, -0.45),   "rthigh");     //10
+    makeJoint("rhfoot",     PVector3(0.2, -0.8, -0.5),    "rhknee");     //11
     
-    makeJoint("lshoulder",  Vector3(-0.2, 0., 0.5),      "shoulders");  //12
-    makeJoint("lfknee",     Vector3(-0.2, -0.4, 0.5),    "lshoulder");  //13
-    makeJoint("lffoot",     Vector3(-0.2, -0.8, 0.5),    "lfknee");     //14
+    makeJoint("lshoulder",  PVector3(-0.2, 0., 0.5),      "shoulders");  //12
+    makeJoint("lfknee",     PVector3(-0.2, -0.4, 0.5),    "lshoulder");  //13
+    makeJoint("lffoot",     PVector3(-0.2, -0.8, 0.5),    "lfknee");     //14
     
-    makeJoint("rshoulder",  Vector3(0.2, 0.0, 0.5),      "shoulders");  //15
-    makeJoint("rfknee",     Vector3(0.2, -0.4, 0.5),     "rshoulder");  //16
-    makeJoint("rffoot",     Vector3(0.2, -0.8, 0.5),     "rfknee");     //17
+    makeJoint("rshoulder",  PVector3(0.2, 0.0, 0.5),      "shoulders");  //15
+    makeJoint("rfknee",     PVector3(0.2, -0.4, 0.5),     "rshoulder");  //16
+    makeJoint("rffoot",     PVector3(0.2, -0.8, 0.5),     "rfknee");     //17
     
-    makeJoint("hlshoulder", Vector3(-0.2, 0.5, 0.5),     "hshoulders"); //18
-    makeJoint("lelbow",     Vector3(-0.4, 0.25, 0.575),  "hlshoulder"); //19
-    makeJoint("lhand",      Vector3(-0.6, 0.0, 0.65),    "lelbow");     //20
+    makeJoint("hlshoulder", PVector3(-0.2, 0.5, 0.5),     "hshoulders"); //18
+    makeJoint("lelbow",     PVector3(-0.4, 0.25, 0.575),  "hlshoulder"); //19
+    makeJoint("lhand",      PVector3(-0.6, 0.0, 0.65),    "lelbow");     //20
     
-    makeJoint("hrshoulder", Vector3(0.2, 0.5, 0.5),      "hshoulders"); //21
-    makeJoint("relbow",     Vector3(0.4, 0.25, 0.575),   "hrshoulder"); //22
-    makeJoint("rhand",      Vector3(0.6, 0.0, 0.65),     "relbow");     //23
+    makeJoint("hrshoulder", PVector3(0.2, 0.5, 0.5),      "hshoulders"); //21
+    makeJoint("relbow",     PVector3(0.4, 0.25, 0.575),   "hrshoulder"); //22
+    makeJoint("rhand",      PVector3(0.6, 0.0, 0.65),     "relbow");     //23
 
-    makeJoint("tail",       Vector3(0., 0., -0.7),       "hips");       //24
+    makeJoint("tail",       PVector3(0., 0., -0.7),       "hips");       //24
 
     //symmetry
     makeSymmetric("lthigh", "rthigh");
@@ -358,7 +358,7 @@ FileSkeleton::FileSkeleton(const std::string &filename)
         if(line.size() < 5)
             continue; //error
 
-        Vector3 p;
+        PVector3 p;
         sscanf(line[1].c_str(), "%lf", &(p[0]));
         sscanf(line[2].c_str(), "%lf", &(p[1]));
         sscanf(line[3].c_str(), "%lf", &(p[2]));
